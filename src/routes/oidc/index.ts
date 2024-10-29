@@ -14,8 +14,8 @@ const oidc: FastifyPluginAsync = async (fastify) => {
 
   // Endpoint for OpenID Credential Issuer Metadata
   fastify.get('/.well-known/openid-credential-issuer', async (request, reply) => {
-    reply.header('Content-Type', 'application/json');
     const issuerUrl = process.env.HOST || 'http://localhost:3000';
+    reply.header('Content-Type', 'application/json');
     return reply.send({
       credential_issuer: issuerUrl,
       credential_formats: ['jwt_vc_json'],
@@ -80,7 +80,7 @@ const oidc: FastifyPluginAsync = async (fastify) => {
       const accessToken = `access-token-${preAuthorizedCode}`;
       sessionData[preAuthorizedCode].accessToken = accessToken;
       console.log(`Generated and stored access token: ${accessToken}`);
-      console.log(`Current sessionData: ${JSON.stringify(sessionData)}`);
+      //console.log(`Current sessionData: ${JSON.stringify(sessionData)}`);
       return reply.send({ access_token: accessToken });
     } else {
       return reply.status(401).send({ error: 'Unauthorized or token already issued' });
