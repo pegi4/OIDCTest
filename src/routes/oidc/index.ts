@@ -14,8 +14,13 @@ const oidc: FastifyPluginAsync = async (fastify) => {
 
   // Endpoint for OpenID Credential Issuer Metadata
   fastify.get('/.well-known/openid-credential-issuer', async (request, reply) => {
+    reply
+      .header('Content-Type', 'application/json')
+      .header('x-powered-by', 'Express')
+      .header('Access-Control-Allow-Origin', '*')
+      .header('Access-Control-Allow-Credentials', 'false'); // or remove it if not needed
+  
     const issuerUrl = process.env.HOST || 'http://localhost:3000';
-    reply.header('Content-Type', 'application/json');
     return reply.send({
       credential_issuer: issuerUrl,
       credential_formats: ['jwt_vc_json'],
@@ -25,6 +30,7 @@ const oidc: FastifyPluginAsync = async (fastify) => {
       credential_endpoint: `${issuerUrl}/credential`,
     });
   });
+  
 
   // Endpoint to create a credential offer
   fastify.post('/credential-offer', async (request, reply) => {
