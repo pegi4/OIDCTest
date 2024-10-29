@@ -8,7 +8,8 @@ dotenv.config();
 const server = fastify({ logger: false });
 
 server.register(cors, {
-  origin: '*'
+  origin: '*',
+  credentials: false,
 });
 
 server.get('/', async (request, reply) => {
