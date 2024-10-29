@@ -14,20 +14,25 @@ const oidc: FastifyPluginAsync = async (fastify) => {
 
   // Endpoint for OpenID Credential Issuer Metadata
   fastify.get('/.well-known/openid-credential-issuer', async (request, reply) => {
+    const issuerUrl = process.env.HOST || 'http://localhost:3000';
+    
     reply
       .header('Content-Type', 'application/json')
-      .header('x-powered-by', 'Express')
-      .header('Access-Control-Allow-Origin', '*')
-      .header('Access-Control-Allow-Credentials', 'false'); // or remove it if not needed
-  
+      .send({
+        credential_issuer: issuerUrl,
+        credential_formats: ['jwt_vc_json'],
+        grant_types_supported: ['urn:ietf:params:oauth:grant-type:pre-authorized_code'],
+        token_endpoint: `${issuerUrl}/token`,
+        authorization_server: issuerUrl,
+        credential_endpoint: `${issuerUrl}/credential`,
+      });
+  });
+
+  fastify.get('/.well-known/openid-configuration', async (request, reply) => {
     const issuerUrl = process.env.HOST || 'http://localhost:3000';
     return reply.send({
       credential_issuer: issuerUrl,
-      credential_formats: ['jwt_vc_json'],
-      grant_types_supported: ['urn:ietf:params:oauth:grant-type:pre-authorized_code'],
       token_endpoint: `${issuerUrl}/token`,
-      authorization_server: issuerUrl,
-      credential_endpoint: `${issuerUrl}/credential`,
     });
   });
   
@@ -37,7 +42,7 @@ const oidc: FastifyPluginAsync = async (fastify) => {
     console.log('Registering /credential-offer');
     const preAuthorizedCode = randomUUID();
     sessionData[preAuthorizedCode] = { issued: false };
-
+  
     const credentialOfferData = {
       credential_issuer: process.env.HOST || 'http://localhost:3000',
       credentials: [
@@ -53,20 +58,22 @@ const oidc: FastifyPluginAsync = async (fastify) => {
         },
       },
     };
-
+  
     sessionData[preAuthorizedCode].credentialOfferData = credentialOfferData;
     const credentialOfferURI = `openid-credential-offer://?credential_offer_uri=${encodeURIComponent(
       `${process.env.HOST}/credential-offer-data/${preAuthorizedCode}`
     )}`;
-
-    return reply.send({ credentialOfferURI });
+  
+    console.log("Generated Credential Offer URI:", credentialOfferURI);
+  
+    return reply.send({credentialOfferURI});
   });
 
   // Endpoint to serve the credential offer data
   fastify.get('/credential-offer-data/:code', async (request, reply) => {
     const { code } = request.params as { code: string };
     const offerData = sessionData[code]?.credentialOfferData;
-
+  
     if (offerData) {
       return reply.send(offerData);
     } else {
@@ -79,14 +86,13 @@ const oidc: FastifyPluginAsync = async (fastify) => {
     const { 'pre-authorized_code': preAuthorizedCode } = request.body as {
       'pre-authorized_code': string;
     };
-
+  
     console.log(`Received pre-authorized code: ${preAuthorizedCode}`);
   
     if (sessionData[preAuthorizedCode]) {
       const accessToken = `access-token-${preAuthorizedCode}`;
       sessionData[preAuthorizedCode].accessToken = accessToken;
       console.log(`Generated and stored access token: ${accessToken}`);
-      //console.log(`Current sessionData: ${JSON.stringify(sessionData)}`);
       return reply.send({ access_token: accessToken });
     } else {
       return reply.status(401).send({ error: 'Unauthorized or token already issued' });
