@@ -83,6 +83,8 @@ const oidc: FastifyPluginAsync = async (fastify) => {
 
   // Token endpoint to issue an access token
   fastify.post('/token', async (request, reply) => {
+    console.log('Token endpoint hit');
+    
     const { 'pre-authorized_code': preAuthorizedCode } = request.body as {
       'pre-authorized_code': string;
     };

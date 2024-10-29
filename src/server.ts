@@ -1,4 +1,5 @@
 import fastify from 'fastify';
+import formbody from '@fastify/formbody';
 import * as dotenv from 'dotenv';
 import cors from '@fastify/cors';
 import oidc from './routes/oidc';
@@ -6,6 +7,8 @@ import oidc from './routes/oidc';
 dotenv.config();
 
 const server = fastify({ logger: false });
+
+server.register(formbody);
 
 server.register(cors, {
   origin: '*',
