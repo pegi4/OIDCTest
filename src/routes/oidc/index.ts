@@ -40,7 +40,7 @@ const oidc: FastifyPluginAsync = async (fastify) => {
   // Endpoint to create a credential offer
   fastify.post('/credential-offer', async (request, reply) => {
     console.log('Registering /credential-offer');
-    const preAuthorizedCode = randomUUID();
+    const preAuthorizedCode = Math.random().toString(36).substr(2, 9);
     sessionData[preAuthorizedCode] = { issued: false };
   
     const credentialOfferData = {
