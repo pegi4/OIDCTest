@@ -14,6 +14,7 @@ const oidc: FastifyPluginAsync = async (fastify) => {
 
   // Endpoint for OpenID Credential Issuer Metadata
   fastify.get('/.well-known/openid-credential-issuer', async (request, reply) => {
+    reply.header('Content-Type', 'application/json');
     const issuerUrl = process.env.HOST || 'http://localhost:3000';
     return reply.send({
       credential_issuer: issuerUrl,
