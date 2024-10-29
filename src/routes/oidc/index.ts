@@ -52,7 +52,7 @@ const oidc: FastifyPluginAsync = async (fastify) => {
       `${process.env.HOST}/credential-offer-data/${preAuthorizedCode}`
     )}`;
 
-    return reply.send(credentialOfferURI);
+    return reply.send({ credentialOfferURI });
   });
 
   // Endpoint to serve the credential offer data
@@ -72,6 +72,8 @@ const oidc: FastifyPluginAsync = async (fastify) => {
     const { 'pre-authorized_code': preAuthorizedCode } = request.body as {
       'pre-authorized_code': string;
     };
+
+    console.log(`Received pre-authorized code: ${preAuthorizedCode}`);
   
     if (sessionData[preAuthorizedCode]) {
       const accessToken = `access-token-${preAuthorizedCode}`;
