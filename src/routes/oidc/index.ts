@@ -84,23 +84,59 @@ const oidc: FastifyPluginAsync = async (fastify) => {
   // Token endpoint to issue an access token
   fastify.post('/token', async (request, reply) => {
     console.log('Token endpoint hit');
+  
+    // Log request headers
+    console.log('Request headers:', request.headers);
+  
+    // Log request body
     console.log('Request body:', request.body);
-
+  
     const { 'pre-authorized_code': preAuthorizedCode } = request.body as {
       'pre-authorized_code': string;
     };
   
     console.log(`Received pre-authorized code: ${preAuthorizedCode}`);
   
+    // Check if the preAuthorizedCode is in session data
     if (sessionData[preAuthorizedCode]) {
       const accessToken = `access-token-${preAuthorizedCode}`;
       sessionData[preAuthorizedCode].accessToken = accessToken;
+  
+      // Log generated access token
       console.log(`Generated and stored access token: ${accessToken}`);
-      return reply.send({ access_token: accessToken });
+  
+      // Set response headers (optional, only if you want to customize)
+      reply.header('Content-Type', 'application/json; charset=utf-8');
+      reply.header('Access-Control-Allow-Origin', '*');
+  
+      // Log response headers
+      console.log('Response headers:', reply.getHeaders());
+  
+      // Log response body before sending
+      const responseBody = { access_token: accessToken };
+      console.log('Response body:', responseBody);
+  
+      // Send response
+      return reply.send(responseBody);
     } else {
-      return reply.status(401).send({ error: 'Unauthorized or token already issued' });
+      // Log unauthorized response
+      console.log('Unauthorized access or token already issued');
+  
+      // Set status and response headers for 401
+      reply.status(401).header('Content-Type', 'application/json; charset=utf-8');
+  
+      // Log response headers
+      console.log('Response headers for 401:', reply.getHeaders());
+  
+      // Log response body before sending
+      const responseBody = { error: 'Unauthorized or token already issued' };
+      console.log('Response body for 401:', responseBody);
+  
+      // Send 401 response
+      return reply.send(responseBody);
     }
   });
+  
 
   // Credential issuance endpoint to return the VC
   fastify.post('/credential', async (request, reply) => {
