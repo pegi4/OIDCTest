@@ -2,10 +2,22 @@ import fastify from 'fastify';
 import * as dotenv from 'dotenv';
 import cors from '@fastify/cors';
 import oidc from './routes/oidc';
+import { fastifyExpress } from 'fastify-express';
+import express from 'express'; 
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
 const server = fastify({ logger: false });
+
+// Registriraj fastify-express plugin
+server.register(fastifyExpress).then(() => {
+  // Po registraciji lahko uporabljaš Express middleware
+  
+  // Primer uporabe Express body-parser middleware-a
+  server.register(bodyParser.json()); // Za obravnavo JSON podatkov
+  server.register(bodyParser.urlencoded({ extended: true })); // Za obravnavo x-www-form-urlencoded podatkov
+});
 
 server.register(cors, {
   origin: '*',

@@ -12,8 +12,6 @@ interface SessionData {
 }
 
 const oidc: FastifyPluginAsyncJsonSchemaToTs = async (fastify): Promise<void> => {
-  
-  await fastify.register(fastifyFormbody, { bodyLimit: 1048576 * 10 });
 
   const sessionData: SessionData = {};
 
@@ -101,6 +99,8 @@ const oidc: FastifyPluginAsyncJsonSchemaToTs = async (fastify): Promise<void> =>
     };
   
     console.log(`Received pre-authorized code: ${preAuthorizedCode}`);
+
+    console.log("Session Data:", sessionData);
   
     // Check if the preAuthorizedCode is in session data
     if (sessionData[preAuthorizedCode]) {
