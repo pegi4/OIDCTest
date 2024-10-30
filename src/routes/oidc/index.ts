@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import type { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
 import { randomUUID } from 'crypto';
+import { fastifyFormbody } from '@fastify/formbody';
 
 interface SessionData {
   [key: string]: {
@@ -10,7 +11,10 @@ interface SessionData {
   };
 }
 
-const oidc: FastifyPluginAsyncJsonSchemaToTs = async (fastify) => {
+const oidc: FastifyPluginAsyncJsonSchemaToTs = async (fastify): Promise<void> => {
+  
+  await fastify.register(fastifyFormbody, { bodyLimit: 1048576 * 10 });
+
   const sessionData: SessionData = {};
 
   // Endpoint for OpenID Credential Issuer Metadata

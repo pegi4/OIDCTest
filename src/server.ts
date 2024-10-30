@@ -3,14 +3,12 @@ import formbody from '@fastify/formbody';
 import * as dotenv from 'dotenv';
 import cors from '@fastify/cors';
 import oidc from './routes/oidc';
-import fastifyMultipart from '@fastify/multipart';
 
 dotenv.config();
 
 const server = fastify({ logger: false });
 
 server.register(formbody);
-server.register(fastifyMultipart);
 
 server.register(cors, {
   origin: '*',
