@@ -83,33 +83,7 @@ const oidc: FastifyPluginAsyncJsonSchemaToTs = async (fastify) => {
   });
 
   // Token endpoint to issue an access token
-  fastify.post('/token',    {
-    schema: {
-      headers: {
-        'content-type': {
-          type: 'string',
-          enum: ['application/x-www-form-urlencoded'],
-        },
-      },
-      body: {
-        type: 'object',
-        properties: {
-          grant_type: {
-            type: 'string',
-            enum: ['urn:ietf:params:oauth:grant-type:pre-authorized_code'],
-          },
-          'pre-authorized_code': { type: 'string' },
-          user_pin: { type: 'string' },
-        },
-        required: ['grant_type', 'pre-authorized_code'],
-      },
-    },
-
-    config: {
-      description: 'Token endpoint for OpenID credential issuer',
-    },
-    // response: {},
-  }, async (request, reply) => {
+  fastify.post('/token', async (request, reply) => {
     console.log('Token endpoint hit');
   
     // Log request headers
